@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+  <!-- Two converging lane lines forming an M, road stud dot -->
+  <path d="M4 28 L16 6 L28 28" stroke="#F2C230" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10 28 L16 16 L22 28" stroke="#F2C230" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="16" cy="6" r="2" fill="#F2C230"/>
+</svg>

@@ -1,0 +1,79 @@
+{
+  "nav": {
+    "briefing": "Briefing",
+    "scan": "Scan",
+    "map": "Map",
+    "queue": "Priority Queue",
+    "review": "Review",
+    "workorders": "Work Orders",
+    "planner": "Planner",
+    "segments": "Segments",
+    "modellab": "Model Lab",
+    "citizen": "Citizen Portal",
+    "settings": "Settings",
+    "design": "Design System"
+  },
+  "badges": {
+    "demoData": "DEMO DATA",
+    "demoDetector": "DEMO DETECTOR",
+    "experimental": "EXPERIMENTAL"
+  },
+  "severity": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "critical": "Critical"
+  },
+  "defectClass": {
+    "pothole": "Pothole",
+    "longitudinal_crack": "Longitudinal Crack",
+    "transverse_crack": "Transverse Crack",
+    "surface_damage": "Surface Damage",
+    "water": "Water Accumulation"
+  },
+  "status": {
+    "detected": "Detected",
+    "verified": "Verified",
+    "scheduled": "Scheduled",
+    "in_progress": "In Progress",
+    "repaired": "Repaired",
+    "re_inspected": "Re-inspected"
+  },
+  "empty": {
+    "scan": "No scans yet. Drive a road, drop the clip here, and Marga will mark what it finds.",
+    "queue": "No defects in this view. Adjust the filters or start a new scan.",
+    "map": "No defects on this segment. Run a survey to see what's here.",
+    "review": "All caught up. No items waiting for review.",
+    "workorders": "No work orders yet. Verify a defect to create the first one.",
+    "planner": "Set a budget and crew days to generate a repair plan."
+  },
+  "error": {
+    "gps": "Couldn't read GPS from this file. Draw the route on the map instead?",
+    "upload": "Something went wrong with that file. Check the format and try again.",
+    "network": "Couldn't reach the server. Running in static demo mode.",
+    "model": "Model weights not installed — see README to train and add best.onnx."
+  },
+  "actions": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "reclassify": "Reclassify",
+    "createWorkOrder": "Create Work Order",
+    "export": "Export",
+    "runScan": "Run Scan",
+    "drawRoute": "Draw Route",
+    "addNote": "Add Note",
+    "cancel": "Cancel",
+    "save": "Save",
+    "submit": "Submit"
+  },
+  "theme": {
+    "light": "Daylight",
+    "dark": "Night Patrol"
+  },
+  "lang": {
+    "en": "EN",
+    "ta": "தமிழ்"
+  },
+  "region": "Perundurai, Erode",
+  "comingSoon": "{{name}} — coming in a later phase"
+}

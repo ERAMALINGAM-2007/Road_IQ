@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./marga.db:/app/marga.db
+      - ./models:/app/models:ro
+      - ./config:/app/config:ro
+      - ./demo:/app/demo:ro
+    environment:
+      - MARGA_DB_PATH=/app/marga.db
+      - MARGA_JWT_SECRET=${MARGA_JWT_SECRET:-change-me}
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_DEMO_MODE=1

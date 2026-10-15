@@ -1,0 +1,198 @@
+# config/repairs.yaml
+# Indicative repair methods and unit-rate placeholders.
+#
+# ⚠️  ALL COST RATES ARE EDITABLE PLACEHOLDER ASSUMPTIONS.
+#     Replace with the state Schedule of Rates before use.
+#
+# ⚠️  ALL REPAIR METHODS ARE INDICATIVE.
+#     Engineer to confirm based on field assessment.
+#
+# Sources for method descriptions: IRC:SP:16, IRC:SP:83 (indicative only).
+
+repairs:
+
+  pothole:
+    low:
+      method: "Cold-mix patch (temporary)"
+      steps:
+        - "Clean the pothole edges to a square or rectangular shape."
+        - "Remove loose material and standing water."
+        - "Apply cold-mix bituminous material; compact with plate compactor or vehicle tyres."
+        - "Apply sand-blinding if cold-mix is sticky."
+      unit: "per m²"
+      unit_rate_inr: 800
+      mobilisation_inr: 2000
+      notes: "Temporary measure. Hot-mix patch preferred where available."
+
+    medium:
+      method: "Hot-mix bituminous patch"
+      steps:
+        - "Saw-cut or mill to a regular rectangular boundary."
+        - "Remove damaged material to stable base (typically 50–75 mm depth)."
+        - "Apply tack coat (bitumen emulsion SS-1)."
+        - "Fill with dense-bituminous macadam or bituminous concrete; compact in layers."
+        - "Ensure flush surface and seal edges."
+      unit: "per m²"
+      unit_rate_inr: 1400
+      mobilisation_inr: 3500
+      notes: "Recommended standard repair. IRC:SP:16 reference."
+
+    high:
+      method: "Full-depth patch with base repair"
+      steps:
+        - "Mill/excavate to undamaged base layer."
+        - "Stabilise subgrade if saturated."
+        - "Reconstruct granular sub-base and base course."
+        - "Apply prime coat + tack coat."
+        - "Lay hot-mix surface course."
+      unit: "per m²"
+      unit_rate_inr: 2800
+      mobilisation_inr: 6000
+      notes: "Required when base failure is evident. Structural assessment needed."
+
+    critical:
+      method: "Emergency full-depth patch (prioritise within 48 h)"
+      steps:
+        - "Immediately erect warning signs and cones."
+        - "Proceed with full-depth patch as above."
+        - "Consider temporary cold-mix if hot-mix unavailable."
+      unit: "per m²"
+      unit_rate_inr: 3200
+      mobilisation_inr: 6000
+      notes: "Needs prompt human assessment. Engineer to confirm urgency."
+
+  longitudinal_crack:
+    low:
+      method: "Crack sealing (≤ 6 mm width)"
+      steps:
+        - "Clean crack with compressed air/wire brush."
+        - "Apply modified bituminous crack sealant."
+        - "Sand-blind surface before re-opening to traffic."
+      unit: "per linear metre"
+      unit_rate_inr: 150
+      mobilisation_inr: 1500
+
+    medium:
+      method: "Crack filling with fog seal"
+      steps:
+        - "Fill wider cracks (6–25 mm) with hot-poured rubberised bitumen."
+        - "Apply dilute bitumen fog seal to adjacent surface."
+      unit: "per linear metre"
+      unit_rate_inr: 300
+      mobilisation_inr: 2000
+
+    high:
+      method: "Milling and resurfacing"
+      steps:
+        - "Assess depth; if structural, escalate to full-depth patch."
+        - "Mill surface 25–40 mm."
+        - "Apply tack coat + bituminous concrete overlay."
+      unit: "per m²"
+      unit_rate_inr: 1600
+      mobilisation_inr: 4000
+
+    critical:
+      method: "Structural investigation + resurfacing"
+      steps:
+        - "Commission deflection/structural assessment."
+        - "Determine cause (subgrade failure, drainage, loading)."
+        - "Milling + overlay or full-depth reconstruction per assessment."
+      unit: "per m²"
+      unit_rate_inr: 2200
+      mobilisation_inr: 5000
+
+  transverse_crack:
+    low:
+      method: "Crack sealing"
+      unit: "per linear metre"
+      unit_rate_inr: 150
+      mobilisation_inr: 1500
+    medium:
+      method: "Crack filling + fog seal"
+      unit: "per linear metre"
+      unit_rate_inr: 280
+      mobilisation_inr: 2000
+    high:
+      method: "Milling and overlay"
+      unit: "per m²"
+      unit_rate_inr: 1500
+      mobilisation_inr: 4000
+    critical:
+      method: "Full-depth reconstruction"
+      unit: "per m²"
+      unit_rate_inr: 2800
+      mobilisation_inr: 6000
+
+  surface_damage:
+    low:
+      method: "Fog seal / rejuvenator"
+      steps:
+        - "Clean surface."
+        - "Apply dilute asphalt emulsion fog seal."
+        - "Sand-blind."
+      unit: "per m²"
+      unit_rate_inr: 180
+      mobilisation_inr: 1500
+
+    medium:
+      method: "Chip seal (surface dressing)"
+      steps:
+        - "Apply bitumen emulsion binder."
+        - "Spread single-size stone chips."
+        - "Compact with rubber-tyre roller."
+        - "Remove loose chips after 24 h."
+      unit: "per m²"
+      unit_rate_inr: 350
+      mobilisation_inr: 3000
+
+    high:
+      method: "Thin overlay (25–40 mm)"
+      steps:
+        - "Clean and tack-coat."
+        - "Lay dense-bituminous macadam or SDBC 25 mm."
+      unit: "per m²"
+      unit_rate_inr: 900
+      mobilisation_inr: 4000
+
+    critical:
+      method: "Full-depth reconstruction or microsurfacing"
+      steps:
+        - "Structural assessment first."
+        - "Mill and reconstruct or heavy overlay."
+      unit: "per m²"
+      unit_rate_inr: 2200
+      mobilisation_inr: 5500
+
+  water:
+    low:
+      method: "Clear drainage channels"
+      steps:
+        - "De-silt roadside drain."
+        - "Clear blockages in cross-drainage."
+      unit: "per linear metre of drain"
+      unit_rate_inr: 80
+      mobilisation_inr: 1000
+      notes: "EXPERIMENTAL detection — verify on site."
+
+    medium:
+      method: "Drainage rehabilitation + pothole patch"
+      steps:
+        - "Clear and re-grade drain."
+        - "Patch associated pothole."
+        - "Check road camber; if reversed, resurface to restore."
+      unit: "lump sum estimate"
+      unit_rate_inr: 8000
+      mobilisation_inr: 2000
+
+    high:
+      method: "Drainage reconstruction + road resurfacing"
+      unit: "per m (road) + per m (drain)"
+      unit_rate_inr: 2200
+      mobilisation_inr: 5000
+
+    critical:
+      method: "Emergency drainage + road repair; engineer assessment required"
+      unit: "lump sum estimate"
+      unit_rate_inr: 15000
+      mobilisation_inr: 5000
+      notes: "Needs prompt human assessment. May require structural redesign."

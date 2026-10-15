@@ -1,0 +1,173 @@
+# config/scoring.yaml
+# All weights and thresholds for the severity and risk scoring engines.
+# These values are exposed read-only in the UI and editable via Settings.
+# Every change is logged in audit_log with the previous and new values.
+
+# ─────────────────────────────────────────
+# SEVERITY SCORE  S = 100 × clamp(wA·A + wC·C + wP·P + wD·D) + waterBonus
+# ─────────────────────────────────────────
+
+severity:
+  # Component weights (must sum ≤ 1.0 when depth absent; engine renormalises)
+  weights:
+    area:          0.35   # wA — estimated physical area (logistic-squashed, 0–1)
+    class:         0.35   # wC — class base weight (see class_weights below)
+    position:      0.20   # wP — lane position
+    depth:         0.10   # wD — relative depth index (P2 only; excluded & renorm if absent)
+
+  # Class base weights (0–1)
+  class_weights:
+    pothole:           1.00
+    surface_damage:    0.80   # alligator cracking
+    transverse_crack:  0.50
+    longitudinal_crack: 0.35
+    water:             0.40   # experimental; modulated by context signal
+
+  # Lane position weights (0–1)
+  position_weights:
+    wheel_path:  1.00   # centre of travel lane
+    lane_edge:   0.70
+    shoulder:    0.40
+    unknown:     0.70   # neutral fallback when calibration is absent
+
+  # Water-filled bonus (added after clamp; always positive)
+  water_bonus:     8.0   # points; depth unknown → treat as riskier
+
+  # Logistic curve for area normalisation: sigma(k*(x - x0))
+  area_logistic:
+    k:   4.0    # steepness
+    x0:  0.5    # midpoint (m², roughly half a lane-width square)
+    max_area_m2: 2.0   # clips to 1.0 above this
+
+  # Safety overrides (applied AFTER formula; can only increase severity)
+  safety_overrides:
+    pothole_on_fast_road:
+      min_width_cm:    30
+      min_speed_kmh:   60
+      min_severity:    50    # "High" threshold
+    dense_alligator:
+      lane_coverage_fraction: 0.40
+      min_severity:    50
+
+  # Band thresholds (lower-inclusive)
+  bands:
+    low:      0
+    medium:   25
+    high:     50
+    critical: 75
+
+  # Confidence threshold behaviour
+  inference:
+    confidence_default:  0.45    # default YOLO confidence threshold (tuned for best F1)
+    review_band_low:     0.25    # below this → skip (noise)
+    review_band_high:    0.45    # between low and high → Review Queue
+
+# ─────────────────────────────────────────
+# RISK SCORE  R = 100 × (0.40·S' + 0.20·E + 0.15·V + 0.15·G + 0.10·T)
+# ─────────────────────────────────────────
+
+risk:
+  weights:
+    severity:     0.40   # S' = S / 100
+    exposure:     0.20   # E — road class + speed + junction
+    vulnerability: 0.15  # V — nearby sensitive infrastructure
+    persistence:  0.15   # G — recurrence and growth
+    time_weather: 0.10   # T — days unrepaired + rainfall
+
+  # Exposure (E) — OSM highway class → base score
+  exposure:
+    highway_class:
+      motorway:      1.00
+      trunk:         1.00
+      primary:       0.90
+      secondary:     0.75
+      tertiary:      0.60
+      residential:   0.40
+      service:       0.20
+      unclassified:  0.45
+      unknown:       0.50
+    # Speed factor: multiplied on top of class score
+    speed_factor:
+      base_speed_kmh: 50   # default when maxspeed tag absent
+      scale: 0.005         # per km/h above 30; score = 1 + (speed - 30) * scale; clamp(0,1)
+    # Junction/curve proximity bump
+    junction_bump:
+      radius_m:   50
+      value:      0.08
+
+  # Vulnerability (V) — POI proximity
+  vulnerability:
+    search_radius_m: 150
+    poi_types:
+      school:      1.00
+      hospital:    1.00
+      bus_stop:    0.70
+      marketplace: 0.50
+      crossing:    0.60
+    # Distance decay: score = base × exp(-lambda × distance_m)
+    decay_lambda: 0.02
+    # Indian context flag: two-wheelers → increased vulnerability weight
+    two_wheeler_heavy: false   # set true in Settings to boost V
+
+  # Persistence (G) — recurrence and growth
+  persistence:
+    # Observation count: saturating function, max contribution at n_obs = 10
+    obs_saturation_n: 10
+    # Area growth: contribution per survey-to-survey increase in est_area_m2
+    area_growth_per_m2: 0.05
+    # Recurrence after repair: strong boost
+    recurring_after_repair_bonus: 0.20
+    # Days since first seen: saturating; max contribution at 90 days
+    days_saturation: 90
+
+  # Time & Weather (T)
+  time_weather:
+    # Days unrepaired: saturating; max contribution at 60 days
+    days_unrepaired_saturation: 60
+    # Rainfall contribution: score += rain_weight × min(1, rain_mm / rain_saturation_mm)
+    rain_weight:          0.40
+    rain_saturation_mm:   40.0   # mm over 72 h → full contribution
+
+# ─────────────────────────────────────────
+# ROAD HEALTH INDEX  RHI = 100 − min(100, Σ penalty_i)
+# ─────────────────────────────────────────
+
+rhi:
+  segment_length_m: 100   # default segment length for splitting OSM ways
+  penalty:
+    low:      2
+    medium:   5
+    high:     12
+    critical: 25
+  # Area-normalised: penalty × (area_m2 / segment_length_m); cap multiplier at 3
+  area_multiplier_cap: 3.0
+  grades:
+    A: 85
+    B: 70
+    C: 55
+    D: 40
+    F: 0    # < D threshold
+
+# ─────────────────────────────────────────
+# CLUSTERING (DBSCAN)
+# ─────────────────────────────────────────
+
+clustering:
+  eps_m:      10.0    # haversine epsilon for DBSCAN (metres)
+  min_samples: 1      # one observation can form a defect entity
+  same_class_family: true   # only cluster within class families:
+  class_families:           # longitudinal + transverse → "Crack"; others standalone
+    crack: [longitudinal_crack, transverse_crack]
+    surface_damage: [surface_damage]
+    pothole: [pothole]
+    water: [water]
+
+# ─────────────────────────────────────────
+# SCALE ESTIMATION (lane-width calibration)
+# ─────────────────────────────────────────
+
+calibration:
+  default_lane_width_m: 3.5
+  uncertainty_factor:   0.30   # ±30% shown in UI
+  # Horizon row default (% from top of frame); user can adjust
+  default_horizon_fraction: 0.40

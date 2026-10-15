@@ -1,0 +1,18 @@
+[project]
+name = "marga-backend"
+version = "0.1.0"
+description = "Marga — AI-Powered Road Condition Intelligence Backend"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "PL", "RUF"]
+ignore = ["PLR0913", "PLR2004"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+testpaths = ["backend/tests"]
+asyncio_mode = "auto"

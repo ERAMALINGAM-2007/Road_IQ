@@ -1,0 +1,105 @@
+# config/settings.yaml
+# Global defaults. All overridable via the Settings screen and stored in SQLite.
+
+app:
+  name: "Marga"
+  tagline: "Every road, in the order it needs you."
+  version: "0.1.0"
+
+region:
+  name: "Perundurai, Erode"
+  lat: 11.27
+  lon: 77.59
+  zoom: 13
+  district: "Erode"
+  state: "Tamil Nadu"
+
+# ── Ingest ───────────────────────────────────────────────────────────────────
+ingest:
+  max_video_fps_analysis: 2       # frames extracted per second for detection
+  image_size: 640                  # YOLO input size
+  blur_threshold: 80               # Laplacian variance below this → flagged blurry
+  dark_threshold: 30               # mean brightness below this → too dark (0–255)
+  overexposed_threshold: 230       # mean brightness above this → over-exposed
+  max_upload_mb: 500               # hard cap per upload
+  supported_extensions:
+    image: [jpg, jpeg, png, webp]
+    video: [mp4, mov, avi, mkv]
+    gps: [gpx, csv]
+
+# ── Detection ────────────────────────────────────────────────────────────────
+detection:
+  confidence_default: 0.45
+  review_band_low: 0.25
+  review_band_high: 0.45
+  nms_iou_threshold: 0.45
+  sliced_inference: false          # enable for high-res photos (toggle in UI)
+  slice_height: 640
+  slice_width: 640
+  slice_overlap_ratio: 0.20
+
+# ── Classes ───────────────────────────────────────────────────────────────────
+classes:
+  # Internal name → display label
+  pothole:           "Pothole"
+  longitudinal_crack: "Longitudinal Crack"
+  transverse_crack:  "Transverse Crack"
+  surface_damage:    "Surface Damage"
+  water:             "Water Accumulation"  # EXPERIMENTAL
+
+  class_families:
+    crack: [longitudinal_crack, transverse_crack]
+    surface_damage: [surface_damage]
+    pothole: [pothole]
+    water: [water]
+
+# ── Geo / OSM ─────────────────────────────────────────────────────────────────
+geo:
+  osm_cache_ttl_hours: 24
+  nominatim_user_agent: "marga/0.1 (hackathon)"
+  nominatim_delay_s: 1.1          # ≥ 1 req/s; slightly above to be safe
+  overpass_endpoint: "https://overpass-api.de/api/interpreter"
+  overpass_timeout_s: 30
+  osrm_endpoint: "https://router.project-osrm.org"
+  poi_search_radius_m: 150
+  segment_length_m: 100
+
+# ── Weather ───────────────────────────────────────────────────────────────────
+weather:
+  provider: "open-meteo"          # free, no key
+  base_url: "https://api.open-meteo.com/v1/forecast"
+  cache_ttl_hours: 6
+  rain_window_hours_past: 72
+  rain_window_hours_future: 72
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
+auth:
+  jwt_algorithm: "HS256"
+  jwt_expiry_hours: 24
+  demo_accounts:
+    - username: "inspector"
+      password: "marga-demo"
+      role: "inspector"
+    - username: "engineer"
+      password: "marga-demo"
+      role: "engineer"
+    - username: "admin"
+      password: "marga-admin"
+      role: "admin"
+
+# ── Demo / seed ───────────────────────────────────────────────────────────────
+demo:
+  seed_defect_count: 150
+  seed_survey_count: 3
+  seed_citizen_reports: 10
+  demo_mode: true                 # show DEMO DATA badge when seed data is active
+  detector_demo_mode: true        # show DEMO DETECTOR badge when no .onnx present
+
+# ── Frontend ──────────────────────────────────────────────────────────────────
+frontend:
+  default_theme: "light"
+  default_language: "en"
+  map_style: "https://tiles.openfreemap.org/styles/liberty"
+  map_fallback_style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json"
+  cluster_radius: 60              # px, for MapLibre cluster
+  cluster_max_zoom: 14

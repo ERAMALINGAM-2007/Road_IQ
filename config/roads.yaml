@@ -1,0 +1,68 @@
+# config/roads.yaml
+# OSM highway class metadata for exposure scoring and display.
+# Road class → display label, exposure base score, default speed, colour on map.
+
+road_classes:
+
+  motorway:
+    label: "Motorway / Expressway"
+    exposure: 1.00
+    default_speed_kmh: 100
+    colour: "#B3202A"   # Critical red
+    min_lanes: 4
+
+  trunk:
+    label: "National Highway"
+    exposure: 1.00
+    default_speed_kmh: 80
+    colour: "#D9531E"   # High orange
+
+  primary:
+    label: "State Highway"
+    exposure: 0.90
+    default_speed_kmh: 60
+    colour: "#D9A21B"   # Medium amber
+
+  secondary:
+    label: "Major District Road"
+    exposure: 0.75
+    default_speed_kmh: 50
+    colour: "#5E8C61"   # Low green
+
+  tertiary:
+    label: "Other District Road"
+    exposure: 0.60
+    default_speed_kmh: 40
+    colour: "#7BA882"
+
+  residential:
+    label: "Residential / Village Road"
+    exposure: 0.40
+    default_speed_kmh: 30
+    colour: "#9BB09D"
+
+  service:
+    label: "Service / Access Road"
+    exposure: 0.20
+    default_speed_kmh: 20
+    colour: "#B8C0B9"
+
+  unclassified:
+    label: "Unclassified"
+    exposure: 0.45
+    default_speed_kmh: 30
+    colour: "#AAAAAA"
+
+  unknown:
+    label: "Unknown"
+    exposure: 0.50
+    default_speed_kmh: 40
+    colour: "#CCCCCC"
+
+# RHI segment colours (overridden by the design token in frontend)
+rhi_colours:
+  A: "#2F7D5B"
+  B: "#5E8C61"
+  C: "#D9A21B"
+  D: "#D9531E"
+  F: "#B3202A"
