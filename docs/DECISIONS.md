@@ -86,6 +86,22 @@ that WeasyPrint requires. Decision subject to revision if ReportLab proves insuf
 **Decision:** Water accumulation treated as context fusion (precipitation + defect type + slope) and tagged EXPERIMENTAL.
 **Rationale:** Monocular imagery cannot reliably distinguish water depth; fusing 72-hour rainfall gives grounded physical estimates while preserving honest limitations.
 
+## D-015 | Phase 3 | 2026-10-15
+**Decision:** Open-Meteo API chosen for rainfall telemetry with 1-hour caching and offline fallback.
+**Rationale:** Free tier requires zero API key; delivers 72-hour historical and 48-hour forecast precipitation for road weather risk scoring without external billing dependencies.
+
+## D-016 | Phase 3 | 2026-10-15
+**Decision:** Dynamic weight renormalisation when contextual telemetry is unavailable.
+**Rationale:** If rainfall or road class cannot be retrieved due to network or satellite dropouts, remaining factor weights are renormalised to sum to 1.0 rather than penalising or crashing the calculation.
+
+## D-017 | Phase 3 | 2026-10-15
+**Decision:** Haversine DBSCAN spatial clustering (eps = 12 m) for multi-pass defect recurrence.
+**Rationale:** Connects observations from multiple survey passes on the same road section, enabling growth tracking, recurrence detection, and priority escalation for persistent defects.
+
+## D-018 | Phase 3 | 2026-10-15
+**Decision:** Static demo baking to frontend/public/demo-data/*.json for fail-safe live presentations.
+**Rationale:** Protects the team against server cold-starts or network failures in the hackathon venue by enabling VITE_STATIC_DEMO=1.
+
 ---
 
 *Add new decisions here as they are made. Format: D-NNN | Phase N | Date | ...*

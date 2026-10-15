@@ -1,0 +1,146 @@
+{
+  "severity": {
+    "weights": {
+      "area": 0.35,
+      "class": 0.35,
+      "position": 0.2,
+      "depth": 0.1
+    },
+    "class_weights": {
+      "pothole": 1.0,
+      "surface_damage": 0.8,
+      "transverse_crack": 0.5,
+      "longitudinal_crack": 0.35,
+      "water": 0.4
+    },
+    "position_weights": {
+      "wheel_path": 1.0,
+      "lane_edge": 0.7,
+      "shoulder": 0.4,
+      "unknown": 0.7
+    },
+    "water_bonus": 8.0,
+    "area_logistic": {
+      "k": 4.0,
+      "x0": 0.5,
+      "max_area_m2": 2.0
+    },
+    "safety_overrides": {
+      "pothole_on_fast_road": {
+        "min_width_cm": 30,
+        "min_speed_kmh": 60,
+        "min_severity": 50
+      },
+      "dense_alligator": {
+        "lane_coverage_fraction": 0.4,
+        "min_severity": 50
+      }
+    },
+    "bands": {
+      "low": 0,
+      "medium": 25,
+      "high": 50,
+      "critical": 75
+    },
+    "inference": {
+      "confidence_default": 0.45,
+      "review_band_low": 0.25,
+      "review_band_high": 0.45
+    }
+  },
+  "risk": {
+    "weights": {
+      "severity": 0.4,
+      "exposure": 0.2,
+      "vulnerability": 0.15,
+      "persistence": 0.15,
+      "time_weather": 0.1
+    },
+    "exposure": {
+      "highway_class": {
+        "motorway": 1.0,
+        "trunk": 1.0,
+        "primary": 0.9,
+        "secondary": 0.75,
+        "tertiary": 0.6,
+        "residential": 0.4,
+        "service": 0.2,
+        "unclassified": 0.45,
+        "unknown": 0.5
+      },
+      "speed_factor": {
+        "base_speed_kmh": 50,
+        "scale": 0.005
+      },
+      "junction_bump": {
+        "radius_m": 50,
+        "value": 0.08
+      }
+    },
+    "vulnerability": {
+      "search_radius_m": 150,
+      "poi_types": {
+        "school": 1.0,
+        "hospital": 1.0,
+        "bus_stop": 0.7,
+        "marketplace": 0.5,
+        "crossing": 0.6
+      },
+      "decay_lambda": 0.02,
+      "two_wheeler_heavy": false
+    },
+    "persistence": {
+      "obs_saturation_n": 10,
+      "area_growth_per_m2": 0.05,
+      "recurring_after_repair_bonus": 0.2,
+      "days_saturation": 90
+    },
+    "time_weather": {
+      "days_unrepaired_saturation": 60,
+      "rain_weight": 0.4,
+      "rain_saturation_mm": 40.0
+    }
+  },
+  "rhi": {
+    "segment_length_m": 100,
+    "penalty": {
+      "low": 2,
+      "medium": 5,
+      "high": 12,
+      "critical": 25
+    },
+    "area_multiplier_cap": 3.0,
+    "grades": {
+      "A": 85,
+      "B": 70,
+      "C": 55,
+      "D": 40,
+      "F": 0
+    }
+  },
+  "clustering": {
+    "eps_m": 10.0,
+    "min_samples": 1,
+    "same_class_family": true,
+    "class_families": {
+      "crack": [
+        "longitudinal_crack",
+        "transverse_crack"
+      ],
+      "surface_damage": [
+        "surface_damage"
+      ],
+      "pothole": [
+        "pothole"
+      ],
+      "water": [
+        "water"
+      ]
+    }
+  },
+  "calibration": {
+    "default_lane_width_m": 3.5,
+    "uncertainty_factor": 0.3,
+    "default_horizon_fraction": 0.4
+  }
+}

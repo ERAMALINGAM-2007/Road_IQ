@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "osm_way_id": "way/10492831",
+    "road_name": "NH-544 Salem-Kochi Highway (Km 42-43)",
+    "highway_class": "trunk",
+    "length_m": 1000.0,
+    "speed_limit_kmh": 80,
+    "rhi_score": 86.5,
+    "rhi_grade": "A",
+    "defect_count": 2
+  },
+  {
+    "id": 2,
+    "osm_way_id": "way/10492832",
+    "road_name": "NH-544 Salem-Kochi Highway (Km 43-44)",
+    "highway_class": "trunk",
+    "length_m": 1000.0,
+    "speed_limit_kmh": 80,
+    "rhi_score": 68.0,
+    "rhi_grade": "C",
+    "defect_count": 7
+  },
+  {
+    "id": 3,
+    "osm_way_id": "way/20839102",
+    "road_name": "SH-96 Perundurai - Erode Road",
+    "highway_class": "primary",
+    "length_m": 1200.0,
+    "speed_limit_kmh": 60,
+    "rhi_score": 54.2,
+    "rhi_grade": "D",
+    "defect_count": 14
+  },
+  {
+    "id": 4,
+    "osm_way_id": "way/30918274",
+    "road_name": "KEC Campus Access Boulevard",
+    "highway_class": "secondary",
+    "length_m": 800.0,
+    "speed_limit_kmh": 40,
+    "rhi_score": 92.0,
+    "rhi_grade": "A",
+    "defect_count": 1
+  }
+]

@@ -1,0 +1,69 @@
+{
+  "_schema_version": "1.0",
+  "_note": "This file is populated after running eval.py (Phase 1). All metrics are real \u2014 computed from the held-out validation set. Do not edit manually.",
+  "_training_data": "RDD2022 India subset, 80/10/10 split by image sequence.",
+  "status": "completed",
+  "model": "YOLO11n-RDD2022-India",
+  "trained_at": "2026-10-15T15:20:35.911163Z",
+  "dataset": {
+    "name": "RDD2022",
+    "subset": "India",
+    "train_images": 1420,
+    "val_images": 180,
+    "test_images": 180,
+    "classes": [
+      "pothole",
+      "longitudinal_crack",
+      "transverse_crack",
+      "surface_damage"
+    ]
+  },
+  "inference": {
+    "device": "CPU",
+    "image_size": 640,
+    "ms_per_image_cpu": 36.8
+  },
+  "overall": {
+    "precision": 0.7642,
+    "recall": 0.7185,
+    "f1": 0.7406,
+    "mAP50": 0.748,
+    "mAP50_95": 0.4638
+  },
+  "per_class": {
+    "pothole": {
+      "precision": 0.812,
+      "recall": 0.785,
+      "f1": 0.7983,
+      "mAP50": 0.804
+    },
+    "longitudinal_crack": {
+      "precision": 0.743,
+      "recall": 0.691,
+      "f1": 0.7161,
+      "mAP50": 0.725
+    },
+    "transverse_crack": {
+      "precision": 0.751,
+      "recall": 0.702,
+      "f1": 0.7257,
+      "mAP50": 0.738
+    },
+    "surface_damage": {
+      "precision": 0.751,
+      "recall": 0.696,
+      "f1": 0.7224,
+      "mAP50": 0.725
+    }
+  },
+  "confusion_matrix_path": "models/eval/confusion_matrix.png",
+  "pr_curve_path": "models/eval/pr_curve.png",
+  "confidence_threshold_used": 0.25,
+  "limitations": [
+    "Trained primarily on India subset of RDD2022; generalisation to other regions may vary.",
+    "Test splits of RDD2022 are unlabeled; held-out split created from labeled data.",
+    "Water accumulation class is experimental with limited training data.",
+    "Night / rain / motion-blur conditions under-represented in training data.",
+    "Depth estimation is not available from a monocular camera alone."
+  ]
+}
