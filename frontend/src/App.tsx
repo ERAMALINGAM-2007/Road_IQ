@@ -5,8 +5,13 @@ import { ScanPage } from '@/routes/scan/ScanPage';
 import { MapPage } from '@/routes/map/MapPage';
 import { QueuePage } from '@/routes/queue/QueuePage';
 import { ReviewPage } from '@/routes/review/ReviewPage';
+import { WorkOrdersPage } from '@/routes/workorders/WorkOrdersPage';
+import { PlannerPage } from '@/routes/planner/PlannerPage';
+import { ModelLabPage } from '@/routes/modellab/ModelLabPage';
+import { CitizenPage } from '@/routes/citizen/CitizenPage';
+import { SegmentsPage } from '@/routes/segments/SegmentsPage';
+import { SettingsPage } from '@/routes/settings/SettingsPage';
 import { DesignPage } from '@/routes/design/DesignPage';
-import { ComingSoon } from '@/components/shell/ComingSoon';
 
 const router = createBrowserRouter([
   {
@@ -18,12 +23,12 @@ const router = createBrowserRouter([
       { path: 'map',         element: <MapPage /> },
       { path: 'queue',       element: <QueuePage /> },
       { path: 'review',      element: <ReviewPage /> },
-      { path: 'work-orders', element: <ComingSoon name="Work Orders" /> },
-      { path: 'planner',     element: <ComingSoon name="Planner" /> },
-      { path: 'segments',    element: <ComingSoon name="Segments & Reports" /> },
-      { path: 'model-lab',   element: <ComingSoon name="Model Lab" /> },
-      { path: 'citizen',     element: <ComingSoon name="Citizen Portal" /> },
-      { path: 'settings',    element: <ComingSoon name="Settings" /> },
+      { path: 'work-orders', element: <WorkOrdersPage /> },
+      { path: 'planner',     element: <PlannerPage /> },
+      { path: 'segments',    element: <SegmentsPage /> },
+      { path: 'model-lab',   element: <ModelLabPage /> },
+      { path: 'citizen',     element: <CitizenPage /> },
+      { path: 'settings',    element: <SettingsPage /> },
       { path: 'design',      element: <DesignPage /> },
     ],
   },
@@ -32,3 +37,4 @@ const router = createBrowserRouter([
 export default function App() {
   return <RouterProvider router={router} />;
 }
+

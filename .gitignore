@@ -40,3 +40,13 @@ Thumbs.db
 
 # Generated
 docs/screens/
+
+# Runtime data (thumbnails, uploaded videos, extracted frames)
+data/thumbnails/
+data/uploads/
+data/frames/
+data/*.jpg
+data/*.mp4
+
+# Frontend production build
+frontend/dist/

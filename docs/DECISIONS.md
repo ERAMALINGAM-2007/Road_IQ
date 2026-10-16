@@ -102,6 +102,24 @@ that WeasyPrint requires. Decision subject to revision if ReportLab proves insuf
 **Decision:** Static demo baking to frontend/public/demo-data/*.json for fail-safe live presentations.
 **Rationale:** Protects the team against server cold-starts or network failures in the hackathon venue by enabling VITE_STATIC_DEMO=1.
 
+## D-019 | Phase 5 | 2026-10-15
+**Decision:** 0-1 Knapsack Dynamic Programming solver with cost scaling (100 INR granularity) for budget-constrained repair planning.
+**Rationale:** Guarantees mathematically optimal risk reduction under municipal budget caps in O(n·W) time directly inside the browser, avoiding heuristic approximations.
+**Alternatives:** Greedy value-to-cost ratio sorting — faster but sub-optimal on budget edge cases.
+
+## D-020 | Phase 5 | 2026-10-15
+**Decision:** Model Lab transparency dashboard sourcing metrics directly from held-out validation eval files (`metrics.json`).
+**Rationale:** Transparent AI presentation policy; prevents fabricated numbers; clearly exposes class-level failure modes (e.g. surface damage recall) to build technical credibility with judges.
+
+## D-021 | Phase 6 | 2026-10-15
+**Decision:** Bilingual Citizen Hazard Portal (Tamil + English) with anonymous tracking ticket IDs and 4-stage lifecycle stepper.
+**Rationale:** Fulfills SDG 11 civic participation by making defect reporting accessible to local Tamil Nadu commuters without mandatory account creation or app store friction.
+
+## D-022 | Phase 6 | 2026-10-15
+**Decision:** Cryptographic SHA-256 evidence sealing on survey vantage frames.
+**Rationale:** Implements tamper-detection and RFC 3161 audit trail standards so captured defect imagery can withstand legal and municipal inspection scrutiny.
+
 ---
 
-*Add new decisions here as they are made. Format: D-NNN | Phase N | Date | ...*
+*All 22 architectural decisions documented. Phase 0 through Phase 6 complete.*
+

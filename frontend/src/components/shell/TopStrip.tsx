@@ -15,18 +15,11 @@ export function TopStrip() {
   return (
     <header className="top-strip" role="banner">
       {/* Wordmark */}
-      <div className="flex items-center gap-2 mr-6">
+      <div className="flex items-center gap-3 mr-6">
         <span className="font-display text-[var(--marking)] text-md font-semibold tracking-tight select-none">
           Marga
         </span>
-        {/* Dashed road centreline underline motif */}
-        <span
-          aria-hidden="true"
-          className="w-8 h-[2px] opacity-60"
-          style={{
-            backgroundImage: 'repeating-linear-gradient(90deg, var(--marking) 0, var(--marking) 5px, transparent 5px, transparent 9px)',
-          }}
-        />
+        <span aria-hidden="true" className="h-3.5 w-[1px] bg-[rgba(236,232,221,0.25)]" />
       </div>
 
       {/* Region + survey picker */}

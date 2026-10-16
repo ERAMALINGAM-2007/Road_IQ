@@ -557,6 +557,64 @@ a:hover {
   letter-spacing: 0.04em;
 }
 
+/* ── What-If Panel ──────────────────────────────────────────────── */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.25s ease-out;
+}
+
+/* Custom range slider — Warm Industrial themed */
+.whatif-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--rule);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+.whatif-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--paper);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  cursor: grab;
+  transition: transform 0.1s ease;
+}
+.whatif-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.whatif-slider::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: scale(1.25);
+}
+.whatif-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--paper);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.18);
+  cursor: grab;
+}
+
+/* Kanban card drag ghost */
+.kanban-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.kanban-card:active {
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
 /* ── Responsive helpers ─────────────────────────────────────────── */
 @media (max-width: 768px) {
   :root {
@@ -570,3 +628,4 @@ a:hover {
     display: none;
   }
 }
+

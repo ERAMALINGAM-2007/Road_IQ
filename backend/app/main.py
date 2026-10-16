@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 
 from backend.app.core.config import settings, THUMBNAILS_DIR
 from backend.app.core.database import init_db
-from backend.app.api import health, surveys, defects, segments
+from backend.app.api import health, surveys, defects, segments, citizen, export
 
 
 @asynccontextmanager
@@ -51,6 +51,8 @@ app.include_router(health.router, prefix="/api")
 app.include_router(surveys.router, prefix="/api")
 app.include_router(defects.router, prefix="/api")
 app.include_router(segments.router, prefix="/api")
+app.include_router(citizen.router, prefix="/api")
+app.include_router(export.router, prefix="/api")
 
 
 # Root redirect or greeting

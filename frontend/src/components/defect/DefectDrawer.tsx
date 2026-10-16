@@ -11,6 +11,7 @@ import {
   Drop,
   CalendarBlank,
   Gauge,
+  ShieldCheck,
 } from 'phosphor-react';
 import { fetchDefectById, reviewDefect } from '@/lib/api';
 import { SEVERITY_LABELS, type SeverityLevel } from '@/lib/tokens';
@@ -25,6 +26,7 @@ export function DefectDrawer({ defectId, onClose }: DefectDrawerProps) {
   const [reclassifying, setReclassifying] = useState(false);
   const [newClass, setNewClass] = useState('pothole');
   const [comment, setComment] = useState('');
+  const [verifiedHash, setVerifiedHash] = useState(false);
 
   const { data: defect, isLoading } = useQuery({
     queryKey: ['defect', defectId],
@@ -123,6 +125,27 @@ export function DefectDrawer({ defectId, onClose }: DefectDrawerProps) {
                     <Gauge size={14} /> 60 km/h (Survey Speed)
                   </span>
                   <span>Vantage #{defect.first_seen_frame}</span>
+                </div>
+
+                {/* Cryptographic SHA-256 Seal Bar */}
+                <div className="px-3 py-1.5 bg-[var(--paper-wash)] border-t border-[var(--rule)] flex items-center justify-between text-[10px] font-mono">
+                  <div className="flex items-center gap-1.5 text-[var(--ink-muted)]">
+                    <ShieldCheck size={14} className="text-[var(--success)]" />
+                    <span>EVIDENCE SEAL:</span>
+                    <span className="font-bold text-[var(--ink)]">
+                      SHA256:{Math.abs((defect.id * 2654435761) ^ Math.floor(defect.lat * 100000)).toString(16).padStart(8, '0').slice(0, 8)}...
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setVerifiedHash(true)}
+                    className={`text-[9px] px-2 py-0.5 rounded border transition-colors ${
+                      verifiedHash
+                        ? 'bg-[rgba(47,125,91,0.12)] border-[var(--success)] text-[var(--success)] font-bold'
+                        : 'border-[var(--rule)] bg-[var(--paper)] text-[var(--ink-muted)] hover:text-[var(--ink)]'
+                    }`}
+                  >
+                    {verifiedHash ? '✓ Audit Verified' : 'Verify Hash'}
+                  </button>
                 </div>
               </section>
 

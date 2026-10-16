@@ -49,6 +49,7 @@ export interface SegmentItem {
   rhi_score: number;
   rhi_grade: 'A' | 'B' | 'C' | 'D' | 'F';
   defect_count: number;
+  coords?: [number, number][];
 }
 
 export interface DefectDetail extends DefectItem {
@@ -247,3 +248,230 @@ function applyDetailOverrides(defect: DefectDetail): DefectDetail {
   }
   return defect;
 }
+
+// ─── Work Orders ───────────────────────────────────────────────
+
+export interface WorkOrderItem {
+  id: number;
+  defect_id: number;
+  class_name: string;
+  severity_band: string;
+  risk_score: number;
+  lat: number;
+  lon: number;
+  est_area_m2: number;
+  status: 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  repair_method: string;
+  estimated_cost_inr: number;
+  scheduled_date: string | null;
+  assigned_crew: string | null;
+  notes: string | null;
+  road_name: string;
+  created_at: string;
+}
+
+// In-memory overrides for Kanban drag-and-drop in static demo
+const workOrderOverrides: Record<number, Partial<WorkOrderItem>> = {};
+
+export async function fetchWorkOrders(): Promise<WorkOrderItem[]> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/work-orders`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through to static demo
+    }
+  }
+  const staticRes = await fetch('/demo-data/work-orders.json');
+  const data: WorkOrderItem[] = await staticRes.json();
+  return data.map((wo) => (workOrderOverrides[wo.id] ? { ...wo, ...workOrderOverrides[wo.id] } : wo));
+}
+
+export async function updateWorkOrderStatus(
+  id: number,
+  status: WorkOrderItem['status'],
+): Promise<WorkOrderItem> {
+  workOrderOverrides[id] = { ...workOrderOverrides[id], status };
+
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/work-orders/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // Return optimistic
+    }
+  }
+
+  // Return a stub — the caller will refetch
+  return { id, status } as WorkOrderItem;
+}
+
+// ─── Scoring Config (What-If Panel) ────────────────────────────
+
+export interface ScoringConfig {
+  severity: {
+    weights: Record<string, number>;
+    class_weights: Record<string, number>;
+    position_weights: Record<string, number>;
+    water_bonus: number;
+    bands: Record<string, number>;
+  };
+  risk: {
+    weights: Record<string, number>;
+  };
+}
+
+export async function fetchScoringConfig(): Promise<ScoringConfig> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/scoring`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through
+    }
+  }
+  const staticRes = await fetch('/demo-data/scoring.json');
+  return await staticRes.json();
+}
+
+// ─── Model Metrics (Model Lab) ─────────────────────────────────
+
+export interface ModelMetrics {
+  status: string;
+  model: string;
+  trained_at: string;
+  dataset: {
+    name: string;
+    subset: string;
+    train_images: number;
+    val_images: number;
+    test_images: number;
+    classes: string[];
+  };
+  inference: {
+    device: string;
+    image_size: number;
+    ms_per_image_cpu: number;
+  };
+  overall: {
+    precision: number;
+    recall: number;
+    f1: number;
+    mAP50: number;
+    mAP50_95: number;
+  };
+  per_class: Record<string, {
+    precision: number;
+    recall: number;
+    f1: number;
+    mAP50: number;
+  }>;
+  limitations: string[];
+}
+
+export async function fetchModelMetrics(): Promise<ModelMetrics> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/model/metrics`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through
+    }
+  }
+  const staticRes = await fetch('/demo-data/metrics.json');
+  return await staticRes.json();
+}
+
+// ─── Citizen Hazard Reporting ─────────────────────────────────
+
+export interface CitizenReportItem {
+  id: number;
+  ticket_id: string;
+  reporter_name?: string;
+  reporter_phone?: string;
+  category: 'pothole' | 'crack' | 'waterlogging' | 'debris' | 'other';
+  severity: 'minor' | 'moderate' | 'dangerous';
+  description?: string;
+  landmark?: string;
+  lat: number;
+  lon: number;
+  image_url?: string;
+  status: 'received' | 'under_review' | 'scheduled' | 'resolved';
+  created_at: string;
+}
+
+export interface CitizenReportInput {
+  reporter_name?: string;
+  reporter_phone?: string;
+  category: string;
+  severity: string;
+  description?: string;
+  landmark?: string;
+  lat: number;
+  lon: number;
+  image_url?: string;
+}
+
+export async function fetchCitizenReports(): Promise<CitizenReportItem[]> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/citizen/reports`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through
+    }
+  }
+  const staticRes = await fetch('/demo-data/citizen-reports.json');
+  return await staticRes.json();
+}
+
+export async function fetchCitizenReportByTicket(ticketId: string): Promise<CitizenReportItem | null> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/citizen/reports/${ticketId}`, { signal: AbortSignal.timeout(2000) });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through
+    }
+  }
+  const reports = await fetchCitizenReports();
+  return reports.find((r) => r.ticket_id.toUpperCase() === ticketId.trim().toUpperCase()) || null;
+}
+
+export async function submitCitizenReport(payload: CitizenReportInput): Promise<CitizenReportItem> {
+  if (!IS_STATIC_DEMO) {
+    try {
+      const res = await fetch(`${BACKEND_BASE}/citizen/reports`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) return await res.json();
+    } catch {
+      // Fall through
+    }
+  }
+
+  // Fallback for static demo: mock ticket generation
+  const mockTicket = `MGA-CIT-${Math.floor(1000 + Math.random() * 9000)}`;
+  return {
+    id: Date.now(),
+    ticket_id: mockTicket,
+    reporter_name: payload.reporter_name || 'Anonymous Citizen',
+    category: payload.category as any,
+    severity: payload.severity as any,
+    description: payload.description,
+    landmark: payload.landmark,
+    lat: payload.lat,
+    lon: payload.lon,
+    status: 'received',
+    created_at: new Date().toISOString(),
+  };
+}
+
+

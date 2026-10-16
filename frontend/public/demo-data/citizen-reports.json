@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "ticket_id": "MGA-CIT-4192",
+    "reporter_name": "Senthil Kumar",
+    "category": "pothole",
+    "severity": "dangerous",
+    "description": "Deep tire-breaker pothole right after Perundurai Bus Stand exit towards Erode. Two-wheelers swerving dangerously into traffic.",
+    "landmark": "Near Perundurai Old Bus Stand, opposite Annapoorna Hotel",
+    "lat": 11.2758,
+    "lon": 77.5841,
+    "status": "scheduled",
+    "created_at": "2026-10-14T09:15:00Z"
+  },
+  {
+    "id": 2,
+    "ticket_id": "MGA-CIT-8231",
+    "reporter_name": "Dr. R. Anand",
+    "category": "waterlogging",
+    "severity": "moderate",
+    "description": "Continuous stagnant water pool blocking the hospital approach road curb. Mosquito breeding and hidden crater underneath.",
+    "landmark": "KEC Campus Main Gate Road near Arch",
+    "lat": 11.2731,
+    "lon": 77.6074,
+    "status": "under_review",
+    "created_at": "2026-10-14T14:30:00Z"
+  },
+  {
+    "id": 3,
+    "ticket_id": "MGA-CIT-3305",
+    "reporter_name": "Kavitha M.",
+    "category": "crack",
+    "severity": "moderate",
+    "description": "Wide longitudinal fissure spreading along the outer lane shoulder. Widening visibly after recent monsoon showers.",
+    "landmark": "State Highway 96, 200m before Toll Gate",
+    "lat": 11.2689,
+    "lon": 77.5912,
+    "status": "received",
+    "created_at": "2026-10-15T06:45:00Z"
+  },
+  {
+    "id": 4,
+    "ticket_id": "MGA-CIT-9184",
+    "reporter_name": "Murugesan P.",
+    "category": "debris",
+    "severity": "minor",
+    "description": "Scattered loose aggregate gravel on the sharp curve. Multiple bikes slipping during morning commute.",
+    "landmark": "Chennimalai Road Junction, Perundurai",
+    "lat": 11.2715,
+    "lon": 77.5790,
+    "status": "resolved",
+    "created_at": "2026-10-13T11:20:00Z"
+  },
+  {
+    "id": 5,
+    "ticket_id": "MGA-CIT-5520",
+    "reporter_name": "Priya Dharshini",
+    "category": "pothole",
+    "severity": "dangerous",
+    "description": "Cluster of three sunken craters across both lanes. School vans having to halt completely to navigate.",
+    "landmark": "Government Boys Higher Secondary School Road",
+    "lat": 11.2782,
+    "lon": 77.5865,
+    "status": "scheduled",
+    "created_at": "2026-10-15T08:10:00Z"
+  }
+]

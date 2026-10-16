@@ -20,7 +20,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from sqlmodel import Session, select
 from backend.app.core.database import engine
-from backend.app.models.schema import Survey, Defect, Segment
+from backend.app.models.schema import Survey, Defect, Segment, WorkOrder, CitizenReport
 from backend.app.core.config import settings, MODELS_DIR
 
 DEMO_DATA_DIR = PROJECT_ROOT / "frontend" / "public" / "demo-data"
@@ -101,11 +101,52 @@ def bake_static_data():
             with open(DEMO_DATA_DIR / "metrics.json", "w", encoding="utf-8") as f:
                 json.dump(metrics_data, f, indent=2)
 
-        # 5. Config
+        # 5. Work Orders
+        work_orders = session.exec(select(WorkOrder)).all()
+        if work_orders:
+            work_orders_payload = [
+                {
+                    "id": wo.id,
+                    "defect_id": wo.defect_id,
+                    "status": wo.status,
+                    "priority": wo.priority,
+                    "repair_method": wo.repair_method,
+                    "estimated_cost_inr": wo.estimated_cost_inr,
+                    "scheduled_date": wo.scheduled_date,
+                    "assigned_crew": wo.assigned_crew,
+                    "notes": wo.notes,
+                }
+                for wo in work_orders
+            ]
+            with open(DEMO_DATA_DIR / "work-orders.json", "w", encoding="utf-8") as f:
+                json.dump(work_orders_payload, f, indent=2)
+
+        # 6. Citizen Reports
+        citizen_reports = session.exec(select(CitizenReport)).all()
+        citizen_payload = [
+            {
+                "id": cr.id,
+                "ticket_id": cr.ticket_id,
+                "reporter_name": cr.reporter_name,
+                "category": cr.category,
+                "severity": cr.severity,
+                "description": cr.description,
+                "landmark": cr.landmark,
+                "lat": cr.lat,
+                "lon": cr.lon,
+                "status": cr.status,
+                "created_at": cr.created_at.isoformat() if hasattr(cr.created_at, "isoformat") else str(cr.created_at),
+            }
+            for cr in citizen_reports
+        ]
+        with open(DEMO_DATA_DIR / "citizen-reports.json", "w", encoding="utf-8") as f:
+            json.dump(citizen_payload, f, indent=2)
+
+        # 7. Config
         with open(DEMO_DATA_DIR / "scoring.json", "w", encoding="utf-8") as f:
             json.dump(settings.SCORING, f, indent=2)
 
-    print(f"[bake_static_demo] Successfully exported: surveys.json ({len(surveys_payload)}), defects.json ({len(defects_payload)}), segments.json ({len(segments_payload)})")
+    print(f"[bake_static_demo] Successfully exported: surveys ({len(surveys_payload)}), defects ({len(defects_payload)}), segments ({len(segments_payload)}), citizen_reports ({len(citizen_payload)})")
 
 
 if __name__ == '__main__':

@@ -47,12 +47,19 @@ async def create_survey(
         with open(saved_video_path, "wb") as buffer:
             shutil.copyfileobj(video_file.file, buffer)
 
+    saved_gpx_path = None
+    if gpx_file:
+        saved_gpx_path = str(UPLOADS_DIR / gpx_file.filename)
+        with open(saved_gpx_path, "wb") as buffer:
+            shutil.copyfileobj(gpx_file.file, buffer)
+
     survey = Survey(
         name=f"Survey {road_name.split()[0]}",
         road_name=road_name,
         status="processing",
         total_frames=24,  # Standard sample run
         video_path=saved_video_path,
+        gpx_path=saved_gpx_path,
     )
     session.add(survey)
     session.commit()
@@ -71,6 +78,7 @@ async def create_survey(
         process_survey_job,
         survey_id=survey.id,
         video_path=saved_video_path,
+        gpx_path=saved_gpx_path,
         progress_callback=lambda curr, tot, msg: update_progress(survey.id, curr, tot, msg),
     )
 

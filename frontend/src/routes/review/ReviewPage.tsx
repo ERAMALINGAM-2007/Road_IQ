@@ -80,19 +80,34 @@ export function ReviewPage() {
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded bg-[var(--paper)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center">
+                    <div className="w-12 h-12 rounded bg-[var(--paper)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center relative">
                       {d.thumbnail_url ? (
-                        <img src={d.thumbnail_url} alt={d.class_name} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-[10px] font-mono text-[var(--ink-muted)]">CROP</span>
-                      )}
+                        <img
+                          src={d.thumbnail_url}
+                          alt={d.class_name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLElement).style.display = 'none';
+                            const parent = (e.target as HTMLElement).parentElement;
+                            if (parent) {
+                              const fallback = parent.querySelector('.review-thumb-fallback');
+                              if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                            }
+                          }}
+                        />
+                      ) : null}
+                      <div className={`review-thumb-fallback w-full h-full flex flex-col items-center justify-center bg-[var(--paper)] ${d.thumbnail_url ? 'hidden' : 'flex'}`}>
+                        <span className="text-[10px] font-mono font-bold text-[var(--ink-muted)] uppercase">
+                          {d.class_name.slice(0, 4)}
+                        </span>
+                      </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span className="text-xs font-bold text-[var(--ink)] truncate">
                           {d.class_name.replace('_', ' ').toUpperCase()}
                         </span>
-                        <span className={`stamp stamp-${d.severity_band} scale-75 origin-left`}>
+                        <span className={`chip chip-${d.severity_band}`}>
                           {SEVERITY_LABELS[d.severity_band as SeverityLevel]}
                         </span>
                       </div>

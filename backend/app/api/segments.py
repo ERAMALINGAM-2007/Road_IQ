@@ -66,6 +66,35 @@ async def list_segments(session: Session = Depends(get_session)):
         session.commit()
         segments = session.exec(select(Segment)).all()
 
+    # GeoJSON coordinates for actual road corridors (lon, lat order for GeoJSON/MapLibre)
+    CORRIDOR_COORDS = {
+        "way/10492831": [
+            [77.5650, 11.2600],
+            [77.5720, 11.2640],
+            [77.5780, 11.2690],
+            [77.5828, 11.2742],
+        ],
+        "way/10492832": [
+            [77.5828, 11.2742],
+            [77.5880, 11.2770],
+            [77.5940, 11.2810],
+            [77.6050, 11.2860],
+        ],
+        "way/20839102": [
+            [77.5830, 11.2740],
+            [77.5920, 11.2770],
+            [77.6030, 11.2800],
+            [77.6150, 11.2840],
+            [77.6250, 11.2880],
+        ],
+        "way/30918274": [
+            [77.6000, 11.2710],
+            [77.6045, 11.2735],
+            [77.6080, 11.2760],
+            [77.6130, 11.2785],
+        ],
+    }
+
     return [
         {
             "id": s.id,
@@ -77,6 +106,11 @@ async def list_segments(session: Session = Depends(get_session)):
             "rhi_score": s.rhi_score,
             "rhi_grade": s.rhi_grade,
             "defect_count": s.defect_count,
+            "coords": CORRIDOR_COORDS.get(s.osm_way_id, [
+                [77.5750, 11.2650],
+                [77.5828, 11.2742],
+                [77.5950, 11.2800],
+            ]),
         }
         for s in segments
     ]

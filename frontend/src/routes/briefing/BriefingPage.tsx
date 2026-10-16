@@ -177,12 +177,27 @@ export function BriefingPage() {
                 </span>
 
                 {/* Thumbnail */}
-                <div className="w-12 h-12 rounded bg-[var(--surface)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded bg-[var(--surface)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center relative">
                   {defect.thumbnail_url ? (
-                    <img src={defect.thumbnail_url} alt={defect.class_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[10px] font-mono text-[var(--ink-muted)]">CROP</span>
-                  )}
+                    <img
+                      src={defect.thumbnail_url}
+                      alt={defect.class_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                        const parent = (e.target as HTMLElement).parentElement;
+                        if (parent) {
+                          const fallback = parent.querySelector('.thumb-fallback');
+                          if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div className={`thumb-fallback w-full h-full flex flex-col items-center justify-center bg-[var(--paper)] ${defect.thumbnail_url ? 'hidden' : 'flex'}`}>
+                    <span className="text-[10px] font-mono font-bold text-[var(--ink-muted)] uppercase">
+                      {defect.class_name.slice(0, 4)}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Defect info */}
@@ -191,7 +206,7 @@ export function BriefingPage() {
                     <span className="text-xs font-bold text-[var(--ink)] truncate">
                       {defect.class_name.replace('_', ' ').toUpperCase()}
                     </span>
-                    <span className={`stamp stamp-${defect.severity_band} scale-75 origin-left`}>
+                    <span className={`chip chip-${defect.severity_band}`}>
                       {SEVERITY_LABELS[defect.severity_band as SeverityLevel]}
                     </span>
                     {defect.is_waterlogged && (
@@ -253,14 +268,14 @@ export function BriefingPage() {
           <h2 className="font-display text-lg font-semibold text-[var(--ink)] pt-2">
             Inspection Passes
           </h2>
-          <div className="card p-4 space-y-2.5">
+          <div className="card p-4 flex flex-col gap-3">
             {surveys.map((survey) => (
-              <div key={survey.id} className="flex items-center justify-between text-xs font-mono">
-                <div>
+              <div key={survey.id} className="flex items-center justify-between text-xs font-mono py-1 border-b border-[var(--rule)] last:border-b-0">
+                <div className="leading-snug">
                   <div className="font-semibold text-[var(--ink)]">{survey.name}</div>
-                  <div className="text-[11px] text-[var(--ink-muted)]">{survey.survey_date}</div>
+                  <div className="text-[11px] text-[var(--ink-muted)] mt-0.5">{survey.survey_date}</div>
                 </div>
-                <span className="px-2 py-0.5 rounded bg-[var(--surface)] border border-[var(--rule)] text-[10px] text-[var(--ok)] font-bold">
+                <span className="px-2 py-0.5 rounded bg-[var(--surface)] border border-[var(--rule)] text-[10px] text-[var(--ok)] font-bold shrink-0">
                   ✓ COMPLETED
                 </span>
               </div>

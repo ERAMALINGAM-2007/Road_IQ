@@ -3,6 +3,7 @@ backend/app/api/defects.py — Defect Query, Detail, and Human Review Endpoints
 """
 
 from typing import List, Optional
+from pathlib import Path
 from pydantic import BaseModel
 from fastapi import APIRouter, Depends, Query, HTTPException, Body
 from sqlmodel import Session, select
@@ -65,7 +66,7 @@ async def list_defects(
             "status": d.status,
             "review_status": d.review_status,
             "is_waterlogged": d.is_waterlogged,
-            "thumbnail_url": f"/api/static/thumbnails/{d.thumbnail_path.split('/')[-1]}" if d.thumbnail_path else None,
+            "thumbnail_url": f"/api/static/thumbnails/{Path(d.thumbnail_path).name}" if d.thumbnail_path else None,
             "explanation": d.explanation,
             "created_at": d.created_at,
         }
@@ -106,6 +107,7 @@ async def get_defect(defect_id: int, session: Session = Depends(get_session)):
         "status": defect.status,
         "review_status": defect.review_status,
         "is_waterlogged": defect.is_waterlogged,
+        "thumbnail_url": f"/api/static/thumbnails/{Path(defect.thumbnail_path).name}" if defect.thumbnail_path else None,
         "explanation": defect.explanation,
         "breakdown": sev_calc["breakdown"],
         "overrides": sev_calc["overrides"],

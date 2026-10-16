@@ -156,3 +156,22 @@ class AuditLog(SQLModel, table=True):
     actor: str = Field(default="system")
     details: Optional[str] = Field(default=None)
     timestamp: datetime = Field(default_factory=utc_now)
+
+
+class CitizenReport(SQLModel, table=True):
+    __tablename__ = "citizen_reports"
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    ticket_id: str = Field(index=True, unique=True)  # e.g. MGA-CIT-8492
+    reporter_name: Optional[str] = Field(default="Anonymous Citizen")
+    reporter_phone: Optional[str] = Field(default=None)
+    category: str = Field(default="pothole", index=True)  # pothole, crack, waterlogging, debris, other
+    severity: str = Field(default="moderate")  # minor, moderate, dangerous
+    description: Optional[str] = Field(default=None)
+    landmark: Optional[str] = Field(default=None)
+    lat: float = Field(default=11.2742)
+    lon: float = Field(default=77.5828)
+    image_url: Optional[str] = Field(default=None)
+    status: str = Field(default="received", index=True)  # received, under_review, scheduled, resolved
+    created_at: datetime = Field(default_factory=utc_now)
+

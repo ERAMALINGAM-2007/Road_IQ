@@ -4,10 +4,16 @@ import {
   MagnifyingGlass,
   Drop,
   ArrowRight,
+  Sliders,
+  FileCsv,
+  GlobeHemisphereWest,
 } from 'phosphor-react';
-import { fetchDefects } from '@/lib/api';
+import { fetchDefects, type DefectItem } from '@/lib/api';
 import { DefectDrawer } from '@/components/defect/DefectDrawer';
 import { SEVERITY_LABELS, type SeverityLevel } from '@/lib/tokens';
+import { WhatIfPanel } from '@/components/whatif/WhatIfPanel';
+import { exportDefectsCSV, exportDefectsGeoJSON } from '@/lib/export';
+
 
 export function QueuePage() {
   const [selectedDefectId, setSelectedDefectId] = useState<number | null>(null);
@@ -16,14 +22,20 @@ export function QueuePage() {
   const [classFilter, setClassFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [onlyWaterlogged, setOnlyWaterlogged] = useState(false);
+  const [whatIfOpen, setWhatIfOpen] = useState(false);
+  const [whatIfDefects, setWhatIfDefects] = useState<DefectItem[] | null>(null);
 
   const { data: defects = [], isLoading } = useQuery({
     queryKey: ['defects'],
     queryFn: () => fetchDefects(),
   });
 
+  // Use What-If overridden defects if available
+  const activeDefects = whatIfDefects || defects;
+  const isWhatIfActive = whatIfDefects !== null;
+
   const filteredDefects = useMemo(() => {
-    return defects
+    return activeDefects
       .filter((d) => {
         if (severityFilter !== 'all' && d.severity_band !== severityFilter) return false;
         if (classFilter !== 'all' && d.class_name !== classFilter) return false;
@@ -38,7 +50,7 @@ export function QueuePage() {
         return true;
       })
       .sort((a, b) => b.risk_score - a.risk_score);
-  }, [defects, severityFilter, classFilter, statusFilter, onlyWaterlogged, search]);
+  }, [activeDefects, severityFilter, classFilter, statusFilter, onlyWaterlogged, search]);
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -56,8 +68,27 @@ export function QueuePage() {
           </p>
         </div>
 
-        {/* Quick Stats Counter */}
-        <div className="flex items-center gap-3 text-xs font-mono">
+        {/* Actions & Stats */}
+        <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
+          <div className="flex items-center gap-1.5 border-r border-[var(--rule)] pr-2.5">
+            <button
+              onClick={() => exportDefectsCSV(filteredDefects)}
+              className="btn btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-2.5"
+              title="Export filtered defects as CSV spreadsheet"
+            >
+              <FileCsv size={14} className="text-[var(--accent)]" />
+              Export CSV
+            </button>
+            <button
+              onClick={() => exportDefectsGeoJSON(filteredDefects)}
+              className="btn btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-2.5"
+              title="Export filtered defects as GeoJSON FeatureCollection for GIS"
+            >
+              <GlobeHemisphereWest size={14} className="text-[var(--info)]" />
+              GeoJSON
+            </button>
+          </div>
+
           <div className="px-3 py-1.5 rounded bg-[var(--surface)] border border-[var(--rule)]">
             Total: <strong className="text-[var(--ink)]">{filteredDefects.length}</strong> / {defects.length}
           </div>
@@ -160,24 +191,39 @@ export function QueuePage() {
                 </div>
 
                 {/* Thumbnail crop */}
-                <div className="w-12 h-12 rounded bg-[var(--surface)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="w-12 h-12 rounded bg-[var(--surface)] border border-[var(--rule)] overflow-hidden shrink-0 flex items-center justify-center relative">
                   {defect.thumbnail_url ? (
-                    <img src={defect.thumbnail_url} alt={defect.class_name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[10px] font-mono text-[var(--ink-muted)]">CROP</span>
-                  )}
+                    <img
+                      src={defect.thumbnail_url}
+                      alt={defect.class_name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = 'none';
+                        const parent = (e.target as HTMLElement).parentElement;
+                        if (parent) {
+                          const fallback = parent.querySelector('.queue-thumb-fallback');
+                          if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                        }
+                      }}
+                    />
+                  ) : null}
+                  <div className={`queue-thumb-fallback w-full h-full flex flex-col items-center justify-center bg-[var(--paper)] ${defect.thumbnail_url ? 'hidden' : 'flex'}`}>
+                    <span className="text-[10px] font-mono font-bold text-[var(--ink-muted)] uppercase">
+                      {defect.class_name.slice(0, 4)}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Details */}
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono text-xs font-semibold text-[var(--ink-muted)]">
                       DEF-{String(defect.id).padStart(4, '0')}
                     </span>
                     <span className="text-xs font-bold text-[var(--ink)]">
                       {defect.class_name.replace('_', ' ').toUpperCase()}
                     </span>
-                    <span className={`stamp stamp-${defect.severity_band} scale-75 origin-left`}>
+                    <span className={`chip chip-${defect.severity_band}`}>
                       {SEVERITY_LABELS[defect.severity_band as SeverityLevel]}
                     </span>
                     {defect.is_waterlogged && (
@@ -230,6 +276,28 @@ export function QueuePage() {
       <DefectDrawer
         defectId={selectedDefectId}
         onClose={() => setSelectedDefectId(null)}
+      />
+
+      {/* What-If Active Indicator */}
+      {isWhatIfActive && (
+        <div className="fixed top-[calc(var(--top-strip-height)+8px)] right-[400px] z-40 px-3 py-1.5 rounded-full bg-[var(--accent)] text-white text-[10px] font-mono font-bold flex items-center gap-1.5 shadow-lg animate-pulse">
+          <Sliders size={12} weight="bold" />
+          WHAT-IF MODE ACTIVE
+          <button
+            onClick={() => setWhatIfDefects(null)}
+            className="ml-1 underline hover:no-underline"
+          >
+            Reset
+          </button>
+        </div>
+      )}
+
+      {/* What-If Panel */}
+      <WhatIfPanel
+        defects={defects}
+        onReranked={(reranked) => setWhatIfDefects(reranked)}
+        isOpen={whatIfOpen}
+        onToggle={() => setWhatIfOpen(!whatIfOpen)}
       />
     </div>
   );

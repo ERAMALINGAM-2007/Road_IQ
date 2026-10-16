@@ -27,6 +27,7 @@ from backend.app.services.severity import calculate_severity
 def process_survey_job(
     survey_id: int,
     video_path: Optional[str] = None,
+    gpx_path: Optional[str] = None,
     progress_callback: Optional[Callable[[int, int, str], None]] = None,
 ):
     """
@@ -49,21 +50,79 @@ def process_survey_job(
         base_lat = 11.2742
         base_lon = 77.5828
 
+        # Parse real GPX points if provided
+        gpx_points = []
+        if gpx_path and os.path.exists(gpx_path):
+            try:
+                import xml.etree.ElementTree as ET
+                tree = ET.parse(gpx_path)
+                for elem in tree.getroot().iter():
+                    if elem.tag.endswith('trkpt') or elem.tag.endswith('wpt'):
+                        g_lat = float(elem.attrib.get('lat', 0))
+                        g_lon = float(elem.attrib.get('lon', 0))
+                        g_ele = 280.0
+                        for child in elem:
+                            if child.tag.endswith('ele') and child.text:
+                                try:
+                                    g_ele = float(child.text)
+                                except ValueError:
+                                    pass
+                        if g_lat != 0 and g_lon != 0:
+                            gpx_points.append((g_lat, g_lon, g_ele))
+                if gpx_points:
+                    print(f"[Ingest] Loaded {len(gpx_points)} real GPS track points from {gpx_path}")
+            except Exception as e:
+                print(f"[Ingest] GPX parsing notice: {e}")
+
         total_frames = survey.total_frames or 30
+
+        # Attempt to open real video file if provided
+        cap = None
+        frame_stride = 10
+        if video_path and os.path.exists(video_path):
+            try:
+                import cv2
+                cap = cv2.VideoCapture(video_path)
+                if cap.isOpened():
+                    vid_total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT) or 0)
+                    if vid_total > 0:
+                        total_frames = min(30, max(6, vid_total // 15))
+                        frame_stride = max(1, vid_total // total_frames)
+                        print(f"[Ingest] Opened real video '{video_path}' with {vid_total} frames. Sampling {total_frames} frames.")
+            except Exception as e:
+                print(f"[Ingest] Video capture fallback: {e}")
+                cap = None
+
         survey.total_frames = total_frames
 
         print(f"[Ingest] Starting survey processing for ID={survey_id} ({total_frames} frames)...")
 
         for f_idx in range(total_frames):
-            # Geo trajectory along the highway
-            dist_km = (f_idx * 0.015)  # 15m per sampled frame
-            lat = base_lat + (dist_km / 111.0)
-            lon = base_lon + (dist_km / 111.0) * 0.85
-            elev = 280.0 + math.sin(f_idx * 0.2) * 4.0
+            # Geo trajectory: use real GPX points if available, otherwise calibrated highway trajectory
+            if gpx_points:
+                p_idx = min(len(gpx_points) - 1, int((f_idx / max(1, total_frames - 1)) * (len(gpx_points) - 1)))
+                lat, lon, elev = gpx_points[p_idx]
+            else:
+                dist_km = (f_idx * 0.015)  # 15m per sampled frame
+                lat = base_lat + (dist_km / 111.0)
+                lon = base_lon + (dist_km / 111.0) * 0.85
+                elev = 280.0 + math.sin(f_idx * 0.2) * 4.0
 
-            # Generate synthetic road frame image for evidence storage
+            # Save real frame or generate synthetic frame for evidence storage
             frame_img_path = THUMBNAILS_DIR / f"survey_{survey_id}_frame_{f_idx}.jpg"
-            if not frame_img_path.exists():
+            saved_real_frame = False
+            if cap and cap.isOpened():
+                try:
+                    import cv2
+                    cap.set(cv2.CAP_PROP_POS_FRAMES, f_idx * frame_stride)
+                    ret, bgr = cap.read()
+                    if ret and bgr is not None:
+                        cv2.imwrite(str(frame_img_path), bgr)
+                        saved_real_frame = True
+                except Exception as ex:
+                    print(f"[Ingest] Error extracting frame {f_idx}: {ex}")
+
+            if not saved_real_frame and not frame_img_path.exists():
                 img = Image.new("RGB", (1280, 720), color=(43, 45, 47))
                 draw = ImageDraw.Draw(img)
                 # Draw road lane markings
@@ -118,6 +177,12 @@ def process_survey_job(
 
             time.sleep(0.02)  # Yield for responsiveness
 
+        if cap:
+            try:
+                cap.release()
+            except Exception:
+                pass
+
         # Finish tracking and consolidate
         final_tracks = tracker.finish()
         print(f"[Ingest] Consolidating {len(final_tracks)} defect tracks for Survey {survey_id}...")
@@ -140,7 +205,25 @@ def process_survey_job(
 
             # Generate thumbnail crop
             thumb_path = THUMBNAILS_DIR / f"defect_thumb_survey_{survey_id}_t{track.track_id}.jpg"
-            if not thumb_path.exists():
+            evidence_file = THUMBNAILS_DIR / f"survey_{survey_id}_frame_{track.first_seen_frame}.jpg"
+
+            saved_crop = False
+            if evidence_file.exists():
+                try:
+                    with Image.open(evidence_file) as ef:
+                        ew, eh = ef.size
+                        # Extract crop around road centre / lower region where defects appear
+                        crop_x1 = max(0, int(ew * 0.25))
+                        crop_y1 = max(0, int(eh * 0.35))
+                        crop_x2 = min(ew, int(ew * 0.75))
+                        crop_y2 = min(eh, int(eh * 0.85))
+                        cropped = ef.crop((crop_x1, crop_y1, crop_x2, crop_y2)).resize((220, 220))
+                        cropped.save(thumb_path, "JPEG")
+                        saved_crop = True
+                except Exception as ex:
+                    print(f"[Ingest] Thumbnail crop error: {ex}")
+
+            if not saved_crop and not thumb_path.exists():
                 thumb_img = Image.new("RGB", (200, 200), color=(50, 52, 55))
                 t_draw = ImageDraw.Draw(thumb_img)
                 color = (179, 32, 42) if sev_result["band"] == "critical" else (217, 83, 30)
